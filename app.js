@@ -11,6 +11,7 @@ const wiki = require("./wiki.js");
 // …
 
 const { getNotes, getNote, createNote } = require("./database.js");
+app.use(express.json()); // for parsing application/json
 
 //custom middleware
 app.use(function (err, req, res, next) {
@@ -27,6 +28,28 @@ app.get("/notes", async function (req, res) {
   } catch (err) {
     console.error(err);
     res.status(500).send("Error getting notes");
+  }
+});
+
+app.get("/notes/:id", async function (req, res) {
+  try {
+    const id = req.params.id;
+    const note = await getNote(id);
+    res.send(note);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error getting note");
+  }
+});
+
+app.post("/notes", async function (req, res) {
+  try {
+    const { title, contents } = req.body;
+    const note = await createNote(title, contents);
+    res.status(201).send(note);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error creating note");
   }
 });
 
